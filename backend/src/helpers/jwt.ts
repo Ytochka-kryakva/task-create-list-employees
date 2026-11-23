@@ -1,6 +1,11 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET!;
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET is not defined. Please set it in .env');
+}
+
 const JWT_EXPIRES_IN = '24h';
 
 export interface JwtPayload {

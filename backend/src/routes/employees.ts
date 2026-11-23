@@ -8,24 +8,9 @@ const router = Router();
 router.use(authMiddleware);
 
 // Получить список сотрудников
-router.get('/', (req: Request, res: Response) => {
+router.get('/', (_req: Request, res: Response) => {
   try {
-    const { search, department } = req.query;
-
-    let query = 'SELECT * FROM employees WHERE 1=1';
-    const params: string[] = [];
-
-    if (search) {
-      query += ' AND full_name LIKE ?';
-      params.push(`%${search}%`);
-    }
-
-    if (department) {
-      query += ' AND department = ?';
-      params.push(department as string);
-    }
-
-    const employees = db.prepare(query).all(...params) as Array<{
+    const employees = db.prepare('SELECT * FROM employees').all() as Array<{
       id: number;
       full_name: string;
       position: string;
@@ -35,7 +20,7 @@ router.get('/', (req: Request, res: Response) => {
 
     res.json(employees);
   } catch {
-    res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    res.status(500).json({ error: 'Ошибка получения списка сотрудников' });
   }
 });
 
@@ -72,7 +57,7 @@ router.post('/', (req: Request, res: Response) => {
 
     res.status(201).json(employee);
   } catch {
-    res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    res.status(500).json({ error: 'Ошибка добавления нового сотрудника' });
   }
 });
 

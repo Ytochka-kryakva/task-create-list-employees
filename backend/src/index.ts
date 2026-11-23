@@ -15,11 +15,6 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/employees', employeesRoutes);
 
-// Проверка работоспособности
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok' });
-});
-
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

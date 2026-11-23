@@ -8,7 +8,8 @@ const router = Router();
 // Регистрация
 router.post('/register', (req, res) => {
   try {
-    const { email, password } = req.body;
+    const password = req.body.password;
+    const email = String(req.body.email).trim().toLowerCase();
 
     // Валидация
     if (!email || !password) {
@@ -38,22 +39,22 @@ router.post('/register', (req, res) => {
     const passwordHash = bcrypt.hashSync(password, 10);
 
     // Создание пользователя
-    db.prepare('INSERT INTO users (email, password_hash) VALUES (?, ?)').run(email, passwordHash);
-
+    const result = db.prepare('INSERT INTO users (email, password_hash) VALUES (?, ?)').run(email, passwordHash);
+    
     // Генерация токена
-    const user = db.prepare('SELECT id, email FROM users WHERE email = ?').get(email) as { id: number; email: string };
-    const token = signToken(user.id, user.email);
+    const token = signToken(Number(result.lastInsertRowid), email);
 
-    res.status(201).json({ token, email: user.email });
+    res.status(201).json({ token, email: email });
   } catch {
-    res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    res.status(500).json({ error: 'Ошибка при регистрации' });
   }
 });
 
 // Вход
 router.post('/login', (req, res) => {
   try {
-    const { email, password } = req.body;
+    const password = req.body.password;
+    const email = String(req.body.email).trim().toLowerCase();
 
     // Валидация
     if (!email || !password) {
